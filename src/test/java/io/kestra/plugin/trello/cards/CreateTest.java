@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 public class CreateTest extends AbstractTrelloTest {
 
     @Inject
@@ -29,7 +31,7 @@ public class CreateTest extends AbstractTrelloTest {
             .build();
 
         RunContext runContext = TestsUtils.mockRunContext(runContextFactory, task, Map.of());
-        task.run(runContext);
+        assertDoesNotThrow(() -> task.run(runContext));
     }
 
     @Test
@@ -47,6 +49,6 @@ public class CreateTest extends AbstractTrelloTest {
             .build();
 
         RunContext runContext = runContextFactory.of();
-        task.run(runContext);
+        assertDoesNotThrow(() -> task.run(runContext));
     }
 }

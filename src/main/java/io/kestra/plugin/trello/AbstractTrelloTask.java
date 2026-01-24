@@ -1,5 +1,6 @@
 package io.kestra.plugin.trello;
 
+import io.kestra.core.http.HttpRequest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.models.tasks.Task;
@@ -39,9 +40,11 @@ public abstract class AbstractTrelloTask extends Task implements RunnableTask<io
         return String.format("%s/%s/%s", rBaseUrl, rVersion, endpoint);
     }
 
-    protected String buildAuthParams(RunContext runContext) throws Exception {
+    protected HttpRequest.HttpRequestBuilder addAuthHeaders(RunContext runContext,
+                                                            HttpRequest.HttpRequestBuilder builder) throws Exception {
         String rApiKey = runContext.render(this.apiKey).as(String.class).orElseThrow();
         String rApiToken = runContext.render(this.apiToken).as(String.class).orElseThrow();
-        return String.format("key=%s&token=%s", rApiKey, rApiToken);
+        String authHeader = String.format("OAuth oauth_consumer_key=\"%s\", oauth_token=\"%s\"", rApiKey, rApiToken);
+        return builder.addHeader("Authorization", authHeader);
     }
 }

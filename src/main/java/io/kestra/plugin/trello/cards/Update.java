@@ -45,7 +45,7 @@ import java.util.Map;
                     type: io.kestra.plugin.trello.cards.Update
                     apiKey: "{{ secret('TRELLO_API_KEY') }}"
                     apiToken: "{{ secret('TRELLO_API_TOKEN') }}"
-                    id: "5abbe4b7ddc1b351ef961414"
+                    cardId: "5abbe4b7ddc1b351ef961414"
                     name: "Updated Card Name"
                     desc: "Updated description"
                 """
@@ -77,7 +77,6 @@ public class Update extends AbstractTrelloTask {
     public VoidOutput run(RunContext runContext) throws Exception {
         String rId = runContext.render(this.cardId).as(String.class).orElseThrow();
         String url = buildApiUrl(runContext, "cards/" + rId);
-        String authParams = buildAuthParams(runContext);
 
         Map<String, Object> updateData = new HashMap<>();
 
@@ -87,15 +86,16 @@ public class Update extends AbstractTrelloTask {
         runContext.render(this.pos).as(String.class).ifPresent(val -> updateData.put("pos", val));
         runContext.render(this.due).as(String.class).ifPresent(val -> updateData.put("due", val));
 
-        HttpRequest request = HttpRequest.builder()
+        HttpRequest.HttpRequestBuilder requestBuilder = HttpRequest.builder()
             .method("PUT")
-            .uri(URI.create(url + "?" + authParams))
+            .uri(URI.create(url))
             .addHeader("Content-Type", "application/json")
             .addHeader("Accept", "application/json")
             .body(HttpRequest.StringRequestBody.builder()
                 .content(JacksonMapper.ofJson().writeValueAsString(updateData))
-                .build())
-            .build();
+                .build());
+
+        HttpRequest request = addAuthHeaders(runContext, requestBuilder).build();
 
         try (HttpClient httpClient = HttpClient.builder()
             .runContext(runContext)

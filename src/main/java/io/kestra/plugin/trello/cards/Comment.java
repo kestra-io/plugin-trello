@@ -45,7 +45,7 @@ import java.nio.charset.StandardCharsets;
                     type: io.kestra.plugin.trello.cards.Comment
                     apiKey: "{{ secret('TRELLO_API_KEY') }}"
                     apiToken: "{{ secret('TRELLO_API_TOKEN') }}"
-                    id: "5abbe4b7ddc1b351ef961414"
+                    cardId: "5abbe4b7ddc1b351ef961414"
                     text: "This is my comment on the card"
                 """
         )
@@ -66,16 +66,15 @@ public class Comment extends AbstractTrelloTask {
         String rId = runContext.render(this.cardId).as(String.class).orElseThrow();
         String rText = runContext.render(this.text).as(String.class).orElseThrow();
 
-        String url = buildApiUrl(runContext, "cards/" + rId + "/actions/comments");
-        String authParams = buildAuthParams(runContext);
+        String url = buildApiUrl(runContext, "cards/" + rId + "/actions/comments") + "?text="
+            + URLEncoder.encode(rText, StandardCharsets.UTF_8);
 
-        String fullUrl = url + "?" + authParams + "&text=" + URLEncoder.encode(rText, StandardCharsets.UTF_8);
-
-        HttpRequest request = HttpRequest.builder()
+        HttpRequest.HttpRequestBuilder requestBuilder = HttpRequest.builder()
             .method("POST")
-            .uri(URI.create(fullUrl))
-            .addHeader("Accept", "application/json")
-            .build();
+            .uri(URI.create(url))
+            .addHeader("Accept", "application/json");
+
+        HttpRequest request = addAuthHeaders(runContext, requestBuilder).build();
 
         try (HttpClient httpClient = HttpClient.builder()
             .runContext(runContext)

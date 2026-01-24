@@ -29,7 +29,7 @@ public class MockTrelloApiServer {
     @Post("/cards")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public HttpResponse<String> createCard(@Body String body, @QueryValue String key, @QueryValue String token) {
+    public HttpResponse<String> createCard(@Body String body, @Header("Authorization") String auth) {
         try {
             Map cardData = objectMapper.readValue(body, Map.class);
             String cardId = "card_" + System.currentTimeMillis();
@@ -49,8 +49,8 @@ public class MockTrelloApiServer {
     @Put("/cards/{cardId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public HttpResponse<String> updateCard(@PathVariable String cardId, @Body String body, @QueryValue String key,
-                                           @QueryValue String token) {
+    public HttpResponse<String> updateCard(@PathVariable String cardId, @Body String body,
+                                           @Header("Authorization") String auth) {
         try {
             Map<String, Object> existingCard = cards.get(cardId);
             if (existingCard == null) {
@@ -68,8 +68,8 @@ public class MockTrelloApiServer {
 
     @Post("/cards/{cardId}/actions/comments")
     @Produces(MediaType.APPLICATION_JSON)
-    public HttpResponse<String> addComment(@PathVariable String cardId, @QueryValue String key,
-                                           @QueryValue String token, @QueryValue String text) {
+    public HttpResponse<String> addComment(@PathVariable String cardId, @Header("Authorization") String auth,
+                                           @QueryValue String text) {
         try {
             Map<String, Object> existingCard = cards.get(cardId);
             if (existingCard == null) {
@@ -94,7 +94,7 @@ public class MockTrelloApiServer {
 
     @Get("/cards/{cardId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public HttpResponse<String> getCard(@PathVariable String cardId, @QueryValue String key, @QueryValue String token) {
+    public HttpResponse<String> getCard(@PathVariable String cardId, @Header("Authorization") String auth) {
         try {
             Map<String, Object> card = cards.get(cardId);
             if (card == null) {

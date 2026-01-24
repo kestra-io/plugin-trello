@@ -74,7 +74,6 @@ public class Create extends AbstractTrelloTask {
     @Override
     public VoidOutput run(RunContext runContext) throws Exception {
         String url = buildApiUrl(runContext, "cards");
-        String authParams = buildAuthParams(runContext);
 
         Map<String, Object> cardData = new HashMap<>();
 
@@ -88,15 +87,16 @@ public class Create extends AbstractTrelloTask {
         runContext.render(this.pos).as(String.class).ifPresent(val -> cardData.put("pos", val));
         runContext.render(this.due).as(String.class).ifPresent(val -> cardData.put("due", val));
 
-        HttpRequest request = HttpRequest.builder()
+        HttpRequest.HttpRequestBuilder requestBuilder = HttpRequest.builder()
             .method("POST")
-            .uri(URI.create(url + "?" + authParams))
+            .uri(URI.create(url))
             .addHeader("Content-Type", "application/json")
             .addHeader("Accept", "application/json")
             .body(HttpRequest.StringRequestBody.builder()
                 .content(JacksonMapper.ofJson().writeValueAsString(cardData))
-                .build())
-            .build();
+                .build());
+
+        HttpRequest request = addAuthHeaders(runContext, requestBuilder).build();
 
         try (HttpClient httpClient = HttpClient.builder()
             .runContext(runContext)

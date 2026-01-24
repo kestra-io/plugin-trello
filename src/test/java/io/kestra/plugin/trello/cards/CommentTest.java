@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 public class CommentTest extends AbstractTrelloTest {
 
     @Inject
@@ -41,7 +43,7 @@ public class CommentTest extends AbstractTrelloTest {
             .build();
 
         RunContext commentContext = runContextFactory.of();
-        commentTask.run(commentContext);
+        assertDoesNotThrow(() -> commentTask.run(commentContext));
     }
 
     @Test
@@ -70,7 +72,7 @@ public class CommentTest extends AbstractTrelloTest {
             .build();
 
         RunContext firstContext = runContextFactory.of();
-        firstCommentTask.run(firstContext);
+        assertDoesNotThrow(() -> firstCommentTask.run(firstContext));
 
         Comment secondCommentTask = Comment.builder()
             .id("test-second-comment")
@@ -83,7 +85,6 @@ public class CommentTest extends AbstractTrelloTest {
             .build();
 
         RunContext secondContext = runContextFactory.of();
-        secondCommentTask.run(secondContext);
-        secondCommentTask.run(secondContext);
+        assertDoesNotThrow(() -> secondCommentTask.run(secondContext));
     }
 }
