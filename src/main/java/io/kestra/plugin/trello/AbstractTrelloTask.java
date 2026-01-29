@@ -1,5 +1,4 @@
 package io.kestra.plugin.trello;
-
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.RunnableTask;
