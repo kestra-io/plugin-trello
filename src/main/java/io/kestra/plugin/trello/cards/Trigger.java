@@ -26,6 +26,7 @@ import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,7 +65,8 @@ import java.util.Optional;
                     type: io.kestra.plugin.trello.cards.Trigger
                     apiKey: "{{ secret('TRELLO_API_KEY') }}"
                     apiToken: "{{ secret('TRELLO_API_TOKEN') }}"
-                    listId: "5abbe4b7ddc1b351ef961414"
+                    lists:
+                      - "5abbe4b7ddc1b351ef961414"
                     interval: PT5M
                 """
         ),
@@ -76,7 +78,7 @@ import java.util.Optional;
                     type: io.kestra.plugin.trello.cards.Trigger
                     apiKey: "{{ secret('TRELLO_API_KEY') }}"
                     apiToken: "{{ secret('TRELLO_API_TOKEN') }}"
-                    listIds:
+                    lists:
                       - "5abbe4b7ddc1b351ef961414"
                       - "5abbe4b7ddc1b351ef961415"
                     interval: PT10M
@@ -115,11 +117,8 @@ public class Trigger extends AbstractTrigger
     @Builder.Default
     protected Property<String> apiBaseUrl = Property.ofValue("https://api.trello.com");
 
-    @Schema(title = "List ID", description = "Single Trello list ID to monitor for card changes")
-    protected Property<String> listId;
-
     @Schema(title = "List IDs", description = "Multiple Trello list IDs to monitor for card changes")
-    protected Property<List<String>> listIds;
+    protected Property<List<String>> lists;
 
     @Schema(title = "Board ID", description = "Trello board ID to monitor for card changes across all lists")
     protected Property<String> boardId;
@@ -143,20 +142,8 @@ public class Trigger extends AbstractTrigger
         String rVersion = runContext.render(this.apiVersion).as(String.class).orElse("1");
         String rBaseUrl = runContext.render(this.apiBaseUrl).as(String.class).orElse("https://api.trello.com");
 
-        // Determine which endpoint to use
-        List<String> listsToMonitor = new ArrayList<>();
-
-        if (this.listId != null) {
-            String rListId = runContext.render(this.listId).as(String.class).orElse(null);
-            if (rListId != null) {
-                listsToMonitor.add(rListId);
-            }
-        }
-
-        if (this.listIds != null) {
-            List<String> rListIds = runContext.render(this.listIds).asList(String.class);
-            listsToMonitor.addAll(rListIds);
-        }
+        List<String> rListIds = runContext.render(this.lists).asList(String.class);
+        List<String> listsToMonitor = new ArrayList<>(rListIds);
 
         runContext.logger().info("Monitoring {} lists for card changes", listsToMonitor.size());
 
@@ -196,16 +183,14 @@ public class Trigger extends AbstractTrigger
 
         // Get the most recent card for the output
         CardData latest = newOrUpdatedCards.stream()
-                .max((c1, c2) -> c1.getLastActivity().compareTo(c2.getLastActivity()))
-                .orElse(newOrUpdatedCards.get(0));
+                .max(Comparator.comparing(CardData::getLastActivity))
+                .orElse(newOrUpdatedCards.getFirst());
 
         Output output = Output.builder()
                 .cardId(latest.getCardId())
                 .cardName(latest.getCardName())
                 .cardUrl(latest.getCardUrl())
                 .cardDescription(latest.getCardDescription())
-                .listId(latest.getListId())
-                .boardId(latest.getBoardId())
                 .lastActivity(latest.getLastActivity())
                 .action(latest.getAction())
                 .newCardsCount(newOrUpdatedCards.size())
@@ -221,19 +206,18 @@ public class Trigger extends AbstractTrigger
             String version, String apiKey, String apiToken,
             String boardId, Instant lastCheckTime) throws Exception {
         String url = buildApiUrl(baseUrl, version, "boards/" + boardId + "/cards");
-        return fetchAndFilterCards(runContext, httpClient, url, apiKey, apiToken, lastCheckTime, boardId, null);
+        return fetchAndFilterCards(runContext, httpClient, url, apiKey, apiToken, lastCheckTime);
     }
 
     private List<CardData> getCardsFromList(RunContext runContext, HttpClient httpClient, String baseUrl,
             String version, String apiKey, String apiToken,
             String listId, Instant lastCheckTime) throws Exception {
         String url = buildApiUrl(baseUrl, version, "lists/" + listId + "/cards");
-        return fetchAndFilterCards(runContext, httpClient, url, apiKey, apiToken, lastCheckTime, null, listId);
+        return fetchAndFilterCards(runContext, httpClient, url, apiKey, apiToken, lastCheckTime);
     }
 
     private List<CardData> fetchAndFilterCards(RunContext runContext, HttpClient httpClient, String url,
-            String apiKey, String apiToken, Instant lastCheckTime,
-            String boardId, String listId) throws Exception {
+            String apiKey, String apiToken, Instant lastCheckTime) throws Exception {
         List<CardData> results = new ArrayList<>();
 
         HttpRequest.HttpRequestBuilder requestBuilder = HttpRequest.builder()
@@ -254,7 +238,7 @@ public class Trigger extends AbstractTrigger
 
         if (cardsArray.isArray()) {
             for (JsonNode cardNode : cardsArray) {
-                CardData cardData = parseCardData(cardNode, lastCheckTime, boardId, listId);
+                CardData cardData = parseCardData(cardNode, lastCheckTime);
                 if (cardData != null) {
                     results.add(cardData);
                 }
@@ -264,8 +248,7 @@ public class Trigger extends AbstractTrigger
         return results;
     }
 
-    private CardData parseCardData(JsonNode cardNode, Instant lastCheckTime, String boardIdOverride,
-            String listIdOverride) {
+    private CardData parseCardData(JsonNode cardNode, Instant lastCheckTime) {
         if (!cardNode.has("dateLastActivity")) {
             return null;
         }
@@ -282,17 +265,11 @@ public class Trigger extends AbstractTrigger
         String cardName = cardNode.has("name") ? cardNode.get("name").asText() : null;
         String cardUrl = cardNode.has("shortUrl") ? cardNode.get("shortUrl").asText() : null;
         String cardDesc = cardNode.has("desc") ? cardNode.get("desc").asText() : null;
-        String listId = listIdOverride != null ? listIdOverride
-                : (cardNode.has("idList") ? cardNode.get("idList").asText() : null);
-        String boardId = boardIdOverride != null ? boardIdOverride
-                : (cardNode.has("idBoard") ? cardNode.get("idBoard").asText() : null);
 
         // Determine if it's a new card or an update based on creation date
         String action = "updated";
         if (cardNode.has("dateLastActivity")) {
             // If the card was created very recently (within a minute of last activity),
-            // consider it new
-            Instant creationTime = lastActivity;
             if (lastActivity.minusSeconds(60).isBefore(lastCheckTime)) {
                 action = "created";
             }
@@ -303,8 +280,6 @@ public class Trigger extends AbstractTrigger
                 .cardName(cardName)
                 .cardUrl(cardUrl)
                 .cardDescription(cardDesc)
-                .listId(listId)
-                .boardId(boardId)
                 .lastActivity(lastActivity)
                 .action(action)
                 .build();
@@ -368,12 +343,6 @@ public class Trigger extends AbstractTrigger
 
         @Schema(title = "Card Description")
         private final String cardDescription;
-
-        @Schema(title = "List ID")
-        private final String listId;
-
-        @Schema(title = "Board ID")
-        private final String boardId;
 
         @Schema(title = "Last Activity Time")
         private final Instant lastActivity;

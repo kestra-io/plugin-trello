@@ -23,7 +23,7 @@ public class TriggerTest extends AbstractTrelloTest {
                 .type(Trigger.class.getName())
                 .apiKey(Property.ofValue("test-key"))
                 .apiToken(Property.ofValue("test-token"))
-                .listId(Property.ofValue("list123"))
+                .lists(Property.ofValue(List.of("list123")))
                 .build();
 
         // Default interval should be 5 minutes
@@ -37,7 +37,7 @@ public class TriggerTest extends AbstractTrelloTest {
                 .type(Trigger.class.getName())
                 .apiKey(Property.ofValue("test-key"))
                 .apiToken(Property.ofValue("test-token"))
-                .listId(Property.ofValue("list123"))
+                .lists(Property.ofValue(List.of("list123")))
                 .interval(java.time.Duration.ofMinutes(10))
                 .build();
 
@@ -53,35 +53,36 @@ public class TriggerTest extends AbstractTrelloTest {
                 .type(Trigger.class.getName())
                 .apiKey(Property.ofValue("my-api-key"))
                 .apiToken(Property.ofValue("my-api-token"))
-                .listId(Property.ofValue("my-list-id"))
+                .lists(Property.ofValue(List.of("my-list-id")))
                 .build();
 
         String renderedApiKey = runContext.render(trigger.getApiKey()).as(String.class).orElse(null);
         String renderedApiToken = runContext.render(trigger.getApiToken()).as(String.class).orElse(null);
-        String renderedListId = runContext.render(trigger.getListId()).as(String.class).orElse(null);
+        List<String> renderedLists = runContext.render(trigger.getLists()).asList(String.class);
 
         assertEquals("my-api-key", renderedApiKey);
         assertEquals("my-api-token", renderedApiToken);
-        assertEquals("my-list-id", renderedListId);
+        assertEquals(1, renderedLists.size());
+        assertEquals("my-list-id", renderedLists.getFirst());
     }
 
     @Test
-    void testCardTriggerWithListIdsPropertyRendering() throws Exception {
+    void testCardTriggerWithListsPropertyRendering() throws Exception {
         RunContext runContext = runContextFactory.of();
 
         Trigger trigger = Trigger.builder()
-                .id("test-list-ids-trigger")
+                .id("test-lists-trigger")
                 .type(Trigger.class.getName())
                 .apiKey(Property.ofValue("test-key"))
                 .apiToken(Property.ofValue("test-token"))
-                .listIds(Property.ofValue(List.of("list1", "list2", "list3")))
+                .lists(Property.ofValue(List.of("list1", "list2", "list3")))
                 .build();
 
-        List<String> renderedListIds = runContext.render(trigger.getListIds()).asList(String.class);
+        List<String> renderedLists = runContext.render(trigger.getLists()).asList(String.class);
 
-        assertEquals(3, renderedListIds.size());
-        assertTrue(renderedListIds.contains("list1"));
-        assertTrue(renderedListIds.contains("list2"));
-        assertTrue(renderedListIds.contains("list3"));
+        assertEquals(3, renderedLists.size());
+        assertTrue(renderedLists.contains("list1"));
+        assertTrue(renderedLists.contains("list2"));
+        assertTrue(renderedLists.contains("list3"));
     }
 }

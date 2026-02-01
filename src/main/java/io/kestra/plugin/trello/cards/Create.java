@@ -1,21 +1,18 @@
 package io.kestra.plugin.trello.cards;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
 import io.kestra.core.http.client.HttpClient;
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
 import io.kestra.core.models.property.Property;
-import io.kestra.core.models.tasks.VoidOutput;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.JacksonMapper;
 import io.kestra.plugin.trello.AbstractTrelloTask;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.net.URI;
@@ -72,7 +69,7 @@ public class Create extends AbstractTrelloTask {
     protected Property<String> due;
 
     @Override
-    public VoidOutput run(RunContext runContext) throws Exception {
+    public io.kestra.core.models.tasks.Output run(RunContext runContext) throws Exception {
         String url = buildApiUrl(runContext, "cards");
 
         Map<String, Object> cardData = new HashMap<>();
@@ -109,7 +106,18 @@ public class Create extends AbstractTrelloTask {
                         + response.getBody());
             }
 
-            return null;
+            JsonNode jsonNode = JacksonMapper.ofJson().readTree(response.getBody());
+
+            return Output.builder()
+                .cardId(jsonNode.has("id") ? jsonNode.get("id").asText() : null)
+                .build();
         }
+    }
+
+    @Builder
+    @Getter
+    public static class Output implements io.kestra.core.models.tasks.Output {
+        @Schema(title = "Card ID")
+        private final String cardId;
     }
 }
