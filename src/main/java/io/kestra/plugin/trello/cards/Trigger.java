@@ -1,22 +1,18 @@
 package io.kestra.plugin.trello.cards;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.kestra.core.http.HttpRequest;
+import io.kestra.core.http.HttpResponse;
+import io.kestra.core.http.client.HttpClient;
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
 import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.conditions.ConditionContext;
 import io.kestra.core.models.executions.Execution;
 import io.kestra.core.models.property.Property;
-import io.kestra.core.models.triggers.AbstractTrigger;
-import io.kestra.core.models.triggers.PollingTriggerInterface;
-import io.kestra.core.models.triggers.TriggerContext;
-import io.kestra.core.models.triggers.TriggerOutput;
-import io.kestra.core.models.triggers.TriggerService;
+import io.kestra.core.models.triggers.*;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.JacksonMapper;
-import io.kestra.core.http.HttpRequest;
-import io.kestra.core.http.HttpResponse;
-import io.kestra.core.http.client.HttpClient;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -26,7 +22,6 @@ import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +30,6 @@ import java.util.Optional;
 @Getter
 @ToString
 @EqualsAndHashCode
-
 @Schema(
     title = "Trigger on Trello card creation or update",
     description = "Monitor Trello lists or boards for new or updated cards and trigger executions when detected. "
@@ -99,7 +93,7 @@ import java.util.Optional;
     }
 )
 public class Trigger extends AbstractTrigger
-        implements PollingTriggerInterface, TriggerOutput<Trigger.Output> {
+    implements PollingTriggerInterface, TriggerOutput<Trigger.Output> {
 
     @Schema(title = "Trello API Key", description = "Your Trello API key")
     @NotNull
@@ -149,28 +143,28 @@ public class Trigger extends AbstractTrigger
 
         // Calculate last check time based on trigger context
         Instant lastCheckTime = context.getNextExecutionDate() != null
-                ? context.getNextExecutionDate().toInstant().minus(this.interval)
-                : Instant.now().minus(this.interval);
+            ? context.getNextExecutionDate().toInstant().minus(this.interval)
+            : Instant.now().minus(this.interval);
 
         List<CardData> newOrUpdatedCards = new ArrayList<>();
 
         try (HttpClient httpClient = HttpClient.builder()
-                .runContext(runContext)
-                .build()) {
+            .runContext(runContext)
+            .build()) {
 
             // If boardId is specified, get all cards from the board
             if (this.boardId != null) {
                 String rBoardId = runContext.render(this.boardId).as(String.class).orElse(null);
                 if (rBoardId != null) {
                     newOrUpdatedCards.addAll(getCardsFromBoard(runContext, httpClient, rBaseUrl, rVersion,
-                            rApiKey, rApiToken, rBoardId, lastCheckTime));
+                        rApiKey, rApiToken, rBoardId, lastCheckTime));
                 }
             }
 
             // Get cards from specified lists
             for (String listId : listsToMonitor) {
                 newOrUpdatedCards.addAll(getCardsFromList(runContext, httpClient, rBaseUrl, rVersion,
-                        rApiKey, rApiToken, listId, lastCheckTime));
+                    rApiKey, rApiToken, listId, lastCheckTime));
             }
         }
 
@@ -181,21 +175,9 @@ public class Trigger extends AbstractTrigger
 
         runContext.logger().info("Found {} new or updated cards", newOrUpdatedCards.size());
 
-        // Get the most recent card for the output
-        CardData latest = newOrUpdatedCards.stream()
-                .max(Comparator.comparing(CardData::getLastActivity))
-                .orElse(newOrUpdatedCards.getFirst());
-
         Output output = Output.builder()
-                .cardId(latest.getCardId())
-                .cardName(latest.getCardName())
-                .cardUrl(latest.getCardUrl())
-                .cardDescription(latest.getCardDescription())
-                .lastActivity(latest.getLastActivity())
-                .action(latest.getAction())
-                .newCardsCount(newOrUpdatedCards.size())
-                .allNewCards(newOrUpdatedCards)
-                .build();
+            .allNewCards(newOrUpdatedCards)
+            .build();
 
         Execution execution = TriggerService.generateExecution(this, conditionContext, context, output);
 
@@ -203,27 +185,27 @@ public class Trigger extends AbstractTrigger
     }
 
     private List<CardData> getCardsFromBoard(RunContext runContext, HttpClient httpClient, String baseUrl,
-            String version, String apiKey, String apiToken,
-            String boardId, Instant lastCheckTime) throws Exception {
+                                             String version, String apiKey, String apiToken,
+                                             String boardId, Instant lastCheckTime) throws Exception {
         String url = buildApiUrl(baseUrl, version, "boards/" + boardId + "/cards");
         return fetchAndFilterCards(runContext, httpClient, url, apiKey, apiToken, lastCheckTime);
     }
 
     private List<CardData> getCardsFromList(RunContext runContext, HttpClient httpClient, String baseUrl,
-            String version, String apiKey, String apiToken,
-            String listId, Instant lastCheckTime) throws Exception {
+                                            String version, String apiKey, String apiToken,
+                                            String listId, Instant lastCheckTime) throws Exception {
         String url = buildApiUrl(baseUrl, version, "lists/" + listId + "/cards");
         return fetchAndFilterCards(runContext, httpClient, url, apiKey, apiToken, lastCheckTime);
     }
 
     private List<CardData> fetchAndFilterCards(RunContext runContext, HttpClient httpClient, String url,
-            String apiKey, String apiToken, Instant lastCheckTime) throws Exception {
+                                               String apiKey, String apiToken, Instant lastCheckTime) throws Exception {
         List<CardData> results = new ArrayList<>();
 
         HttpRequest.HttpRequestBuilder requestBuilder = HttpRequest.builder()
-                .method("GET")
-                .uri(URI.create(url))
-                .addHeader("Accept", "application/json");
+            .method("GET")
+            .uri(URI.create(url))
+            .addHeader("Accept", "application/json");
 
         HttpRequest request = addAuthHeaders(apiKey, apiToken, requestBuilder).build();
 
@@ -231,7 +213,7 @@ public class Trigger extends AbstractTrigger
 
         if (response.getStatus().getCode() != 200) {
             throw new RuntimeException(
-                    "Failed to fetch cards: " + response.getStatus().getCode() + " - " + response.getBody());
+                "Failed to fetch cards: " + response.getStatus().getCode() + " - " + response.getBody());
         }
 
         JsonNode cardsArray = JacksonMapper.ofJson().readTree(response.getBody());
@@ -276,13 +258,13 @@ public class Trigger extends AbstractTrigger
         }
 
         return CardData.builder()
-                .cardId(cardId)
-                .cardName(cardName)
-                .cardUrl(cardUrl)
-                .cardDescription(cardDesc)
-                .lastActivity(lastActivity)
-                .action(action)
-                .build();
+            .cardId(cardId)
+            .cardName(cardName)
+            .cardUrl(cardUrl)
+            .cardDescription(cardDesc)
+            .lastActivity(lastActivity)
+            .action(action)
+            .build();
     }
 
     private String buildApiUrl(String baseUrl, String version, String endpoint) {
@@ -290,7 +272,7 @@ public class Trigger extends AbstractTrigger
     }
 
     private HttpRequest.HttpRequestBuilder addAuthHeaders(String apiKey, String apiToken,
-            HttpRequest.HttpRequestBuilder builder) {
+                                                          HttpRequest.HttpRequestBuilder builder) {
         String authHeader = String.format("OAuth oauth_consumer_key=\"%s\", oauth_token=\"%s\"", apiKey, apiToken);
         return builder.addHeader("Authorization", authHeader);
     }
@@ -298,32 +280,8 @@ public class Trigger extends AbstractTrigger
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(title = "Card ID")
-        private final String cardId;
-
-        @Schema(title = "Card Name")
-        private final String cardName;
-
-        @Schema(title = "Card URL")
-        private final String cardUrl;
-
-        @Schema(title = "Card Description")
-        private final String cardDescription;
-
-        @Schema(title = "List ID")
-        private final String listId;
-
-        @Schema(title = "Board ID")
-        private final String boardId;
-
-        @Schema(title = "Last Activity Time")
-        private final Instant lastActivity;
-
-        @Schema(title = "Action", description = "Whether the card was 'created' or 'updated'")
-        private final String action;
-
         @Schema(title = "Total number of new or updated cards found")
-        private final Integer newCardsCount;
+        private final Integer count;
 
         @Schema(title = "All new or updated cards found")
         private final List<CardData> allNewCards;
@@ -349,5 +307,11 @@ public class Trigger extends AbstractTrigger
 
         @Schema(title = "Action Type")
         private final String action;
+
+        @Schema(title = "List ID")
+        private final String listId;
+
+        @Schema(title = "Board ID")
+        private final String boardId;
     }
 }
