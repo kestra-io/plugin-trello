@@ -20,7 +20,7 @@ public class TrelloMockController {
                     "id": "card123",
                     "name": "Test Card",
                     "desc": "Test Description",
-                    "idList": "%s",
+                    "listId": "%s",
                     "idBoard": "board123",
                     "shortUrl": "https://trello.com/c/card123",
                     "dateLastActivity": "%s"
@@ -41,7 +41,7 @@ public class TrelloMockController {
                     "id": "card456",
                     "name": "Board Test Card",
                     "desc": "Board Test Description",
-                    "idList": "list789",
+                    "listId": "list789",
                     "idBoard": "%s",
                     "shortUrl": "https://trello.com/c/card456",
                     "dateLastActivity": "%s"
@@ -59,7 +59,7 @@ public class TrelloMockController {
                   "id": "test-card-id",
                   "name": "Test Card",
                   "desc": "This is a test card",
-                  "idList": "list123",
+                  "listId": "list123",
                   "idBoard": "board123",
                   "shortUrl": "https://trello.com/c/test123",
                   "dateLastActivity": "%s"
@@ -76,7 +76,7 @@ public class TrelloMockController {
                   "id": "%s",
                   "name": "Updated Card",
                   "desc": "Updated description",
-                  "idList": "list456",
+                  "listId": "list456",
                   "idBoard": "board123",
                   "shortUrl": "https://trello.com/c/%s",
                   "dateLastActivity": "%s"

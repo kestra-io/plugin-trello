@@ -39,7 +39,7 @@ public class MoveTest extends AbstractTrelloTest {
             .apiToken(Property.ofValue("test-token"))
             .apiBaseUrl(Property.ofValue(getApiBaseUrl()))
             .cardId(Property.ofValue("test-card-id"))
-            .idList(Property.ofValue("list456"))
+            .listId(Property.ofValue("list456"))
             .build();
 
         RunContext moveContext = runContextFactory.of();
@@ -66,7 +66,7 @@ public class MoveTest extends AbstractTrelloTest {
             .apiToken(Property.ofValue("test-token"))
             .apiBaseUrl(Property.ofValue(getApiBaseUrl()))
             .cardId(Property.ofValue("test-card-id"))
-            .idList(Property.ofValue("list999"))
+            .listId(Property.ofValue("list999"))
             .pos(Property.ofValue("top"))
             .build();
 
