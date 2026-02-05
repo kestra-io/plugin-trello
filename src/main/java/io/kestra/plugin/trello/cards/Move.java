@@ -46,7 +46,7 @@ import java.util.Map;
                     apiKey: "{{ secret('TRELLO_API_KEY') }}"
                     apiToken: "{{ secret('TRELLO_API_TOKEN') }}"
                     cardId: "5abbe4b7ddc1b351ef961414"
-                    idList: "5abbe4b7ddc1b351ef961415"
+                    listId: "5abbe4b7ddc1b351ef961415"
                 """
         )
     }
@@ -59,7 +59,7 @@ public class Move extends AbstractTrelloTask {
 
     @Schema(title = "Target List ID", description = "The ID of the list to move the card to")
     @NotNull
-    protected Property<String> idList;
+    protected Property<String> listId;
 
     @Schema(title = "Position", description = "The position of the card in the new list. top, bottom, or a positive float")
     protected Property<String> pos;
@@ -71,7 +71,7 @@ public class Move extends AbstractTrelloTask {
 
         Map<String, Object> moveData = new HashMap<>();
 
-        String rIdList = runContext.render(this.idList).as(String.class).orElseThrow();
+        String rIdList = runContext.render(this.listId).as(String.class).orElseThrow();
         moveData.put("idList", rIdList);
 
         runContext.render(this.pos).as(String.class).ifPresent(val -> moveData.put("pos", val));

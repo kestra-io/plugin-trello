@@ -26,7 +26,7 @@ public class CommentTest extends AbstractTrelloTest {
             .apiToken(Property.ofValue("test-token"))
             .apiBaseUrl(Property.ofValue(getApiBaseUrl()))
             .name(Property.ofValue("Card for Comments"))
-            .idList(Property.ofValue("list123"))
+            .listId(Property.ofValue("list123"))
             .build();
 
         RunContext createContext = TestsUtils.mockRunContext(runContextFactory, createTask, Map.of());
@@ -55,7 +55,7 @@ public class CommentTest extends AbstractTrelloTest {
             .apiToken(Property.ofValue("test-token"))
             .apiBaseUrl(Property.ofValue(getApiBaseUrl()))
             .name(Property.ofValue("Card for Multiple Comments"))
-            .idList(Property.ofValue("list456"))
+            .listId(Property.ofValue("list456"))
             .build();
 
         RunContext createContext = TestsUtils.mockRunContext(runContextFactory, createTask, Map.of());

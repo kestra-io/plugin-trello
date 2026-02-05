@@ -26,7 +26,7 @@ public class CreateTest extends AbstractTrelloTest {
             .apiToken(Property.ofValue("test-token"))
             .apiBaseUrl(Property.ofValue(getApiBaseUrl()))
             .name(Property.ofValue("Test Card"))
-            .idList(Property.ofValue("list123"))
+            .listId(Property.ofValue("list123"))
             .desc(Property.ofValue("This is a test card"))
             .build();
 
@@ -43,7 +43,7 @@ public class CreateTest extends AbstractTrelloTest {
             .apiToken(Property.ofValue("test-token"))
             .apiBaseUrl(Property.ofValue(getApiBaseUrl()))
             .name(Property.ofValue("Test Card with Position"))
-            .idList(Property.ofValue("list456"))
+            .listId(Property.ofValue("list456"))
             .desc(Property.ofValue("Card with specific position"))
             .pos(Property.ofValue("top"))
             .build();

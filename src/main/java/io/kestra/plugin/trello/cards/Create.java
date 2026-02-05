@@ -43,7 +43,7 @@ import java.util.Map;
                     apiKey: "{{ secret('TRELLO_API_KEY') }}"
                     apiToken: "{{ secret('TRELLO_API_TOKEN') }}"
                     name: "My New Card"
-                    idList: "5abbe4b7ddc1b351ef961414"
+                    listId: "5abbe4b7ddc1b351ef961414"
                     desc: "This is the card description"
                 """
         )
@@ -57,7 +57,7 @@ public class Create extends AbstractTrelloTask {
 
     @Schema(title = "List ID", description = "The ID of the list where the card will be created")
     @NotNull
-    protected Property<String> idList;
+    protected Property<String> listId;
 
     @Schema(title = "Description", description = "The description for the card")
     protected Property<String> desc;
@@ -75,7 +75,7 @@ public class Create extends AbstractTrelloTask {
         Map<String, Object> cardData = new HashMap<>();
 
         String rName = runContext.render(this.name).as(String.class).orElseThrow();
-        String rIdList = runContext.render(this.idList).as(String.class).orElseThrow();
+        String rIdList = runContext.render(this.listId).as(String.class).orElseThrow();
 
         cardData.put("name", rName);
         cardData.put("idList", rIdList);

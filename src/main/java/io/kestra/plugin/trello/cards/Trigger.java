@@ -66,7 +66,20 @@ import java.util.Optional;
         ),
         @Example(
             title = "Monitor multiple lists for card changes",
+            full = true,
             code = """
+                id: trello_monitor
+                namespace: company.team
+
+                tasks:
+                  - id: notify_slack
+                    type: io.kestra.plugin.notifications.slack.SlackIncomingWebhook
+                    url: "{{ secret('SLACK_WEBHOOK_URL') }}"
+                    payload: |
+                      {
+                        "text": "Card {{ trigger.cardName }} was {{ trigger.action }}: {{ trigger.cardUrl }}"
+                      }
+
                 triggers:
                   - id: multi_list_trigger
                     type: io.kestra.plugin.trello.cards.Trigger
@@ -80,7 +93,20 @@ import java.util.Optional;
         ),
         @Example(
             title = "Monitor a board for card changes",
+            full = true,
             code = """
+                id: trello_board_monitor
+                namespace: company.team
+
+                tasks:
+                  - id: notify_slack
+                    type: io.kestra.plugin.notifications.slack.SlackIncomingWebhook
+                    url: "{{ secret('SLACK_WEBHOOK_URL') }}"
+                    payload: |
+                      {
+                        "text": "Card {{ trigger.cardName }} was {{ trigger.action }}: {{ trigger.cardUrl }}"
+                      }
+
                 triggers:
                   - id: board_trigger
                     type: io.kestra.plugin.trello.cards.Trigger
@@ -92,8 +118,7 @@ import java.util.Optional;
         )
     }
 )
-public class Trigger extends AbstractTrigger
-    implements PollingTriggerInterface, TriggerOutput<Trigger.Output> {
+public class Trigger extends AbstractTrigger implements PollingTriggerInterface, TriggerOutput<Trigger.Output> {
 
     @Schema(title = "Trello API Key", description = "Your Trello API key")
     @NotNull
@@ -176,7 +201,7 @@ public class Trigger extends AbstractTrigger
         runContext.logger().info("Found {} new or updated cards", newOrUpdatedCards.size());
 
         Output output = Output.builder()
-            .allNewCards(newOrUpdatedCards)
+            .cards(newOrUpdatedCards)
             .build();
 
         Execution execution = TriggerService.generateExecution(this, conditionContext, context, output);
@@ -284,7 +309,7 @@ public class Trigger extends AbstractTrigger
         private final Integer count;
 
         @Schema(title = "All new or updated cards found")
-        private final List<CardData> allNewCards;
+        private final List<CardData> cards;
     }
 
     @Builder

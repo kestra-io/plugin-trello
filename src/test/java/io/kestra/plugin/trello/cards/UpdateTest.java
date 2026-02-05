@@ -26,7 +26,7 @@ public class UpdateTest extends AbstractTrelloTest {
             .apiToken(Property.ofValue("test-token"))
             .apiBaseUrl(Property.ofValue(getApiBaseUrl()))
             .name(Property.ofValue("Original Card"))
-            .idList(Property.ofValue("list123"))
+            .listId(Property.ofValue("list123"))
             .build();
 
         RunContext createContext = TestsUtils.mockRunContext(runContextFactory, createTask, Map.of());
@@ -56,7 +56,7 @@ public class UpdateTest extends AbstractTrelloTest {
             .apiToken(Property.ofValue("test-token"))
             .apiBaseUrl(Property.ofValue(getApiBaseUrl()))
             .name(Property.ofValue("Card to Close"))
-            .idList(Property.ofValue("list789"))
+            .listId(Property.ofValue("list789"))
             .build();
 
         RunContext createContext = TestsUtils.mockRunContext(runContextFactory, createTask, Map.of());
