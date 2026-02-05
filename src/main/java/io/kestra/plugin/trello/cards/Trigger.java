@@ -51,7 +51,7 @@ import java.util.Optional;
                     url: "{{ secret('SLACK_WEBHOOK_URL') }}"
                     payload: |
                       {
-                        "text": "Card {{ trigger.cardName }} was {{ trigger.action }}: {{ trigger.cardUrl }}"
+                        "text": "Card {{ trigger.cards[0].cardName }} was {{ trigger.cards[0].action }}: {{ trigger.cards[0].cardUrl }}"
                       }
 
                 triggers:
@@ -77,7 +77,7 @@ import java.util.Optional;
                     url: "{{ secret('SLACK_WEBHOOK_URL') }}"
                     payload: |
                       {
-                        "text": "Card {{ trigger.cardName }} was {{ trigger.action }}: {{ trigger.cardUrl }}"
+                        "text": "Card {{ trigger.cards[0].cardName }} was {{ trigger.cards[0].action }}: {{ trigger.cards[0].cardUrl }}"
                       }
 
                 triggers:
@@ -104,7 +104,7 @@ import java.util.Optional;
                     url: "{{ secret('SLACK_WEBHOOK_URL') }}"
                     payload: |
                       {
-                        "text": "Card {{ trigger.cardName }} was {{ trigger.action }}: {{ trigger.cardUrl }}"
+                        "text": "Card {{ trigger.cards[0].cardName }} was {{ trigger.cards[0].action }}: {{ trigger.cards[0].cardUrl }}"
                       }
 
                 triggers:
@@ -272,7 +272,8 @@ public class Trigger extends AbstractTrigger implements PollingTriggerInterface,
         String cardName = cardNode.has("name") ? cardNode.get("name").asText() : null;
         String cardUrl = cardNode.has("shortUrl") ? cardNode.get("shortUrl").asText() : null;
         String cardDesc = cardNode.has("desc") ? cardNode.get("desc").asText() : null;
-
+        String listId = cardNode.has("idList") ? cardNode.get("idList").asText() : null;
+        String boardId = cardNode.has("idBoard") ? cardNode.get("idBoard").asText() : null;
         // Determine if it's a new card or an update based on creation date
         String action = "updated";
         if (cardNode.has("dateLastActivity")) {
@@ -288,6 +289,8 @@ public class Trigger extends AbstractTrigger implements PollingTriggerInterface,
             .cardUrl(cardUrl)
             .cardDescription(cardDesc)
             .lastActivity(lastActivity)
+            .listId(listId)
+            .boardId(boardId)
             .action(action)
             .build();
     }
