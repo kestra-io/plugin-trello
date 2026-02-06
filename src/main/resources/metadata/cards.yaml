@@ -1,0 +1,8 @@
+group: io.kestra.plugin.trello.cards
+name: "cards"
+title: "Trello Cards"
+description: "Tasks and triggers for managing Trello cards - create, update, move, comment, and monitor card changes."
+body: "The Cards subpackage provides comprehensive functionality for working with Trello cards. It includes tasks to create new cards, update existing ones, move cards between lists or boards, add comments, and a polling trigger to monitor card creation and updates. These capabilities enable automated card management and event-driven workflows based on Trello card activities."
+videos: []
+createdBy: "Kestra Core Team"
+managedBy: "Kestra Core Team"

@@ -1,8 +1,8 @@
 group: io.kestra.plugin.trello
 name: "trello"
 title: "Atlassian Trello"
-description: "Tasks that connect Kestra flows to Atlassian Trello for creating, updating, and retrieving board content."
-body: "Use this plugin to integrate Kestra workflows with Trello via the REST API, enabling seamless management of boards, lists, and cards directly from your Kestra flows."
+description: "Integration plugin for Atlassian Trello to manage boards, lists, cards, and workflow automation."
+body: "Trello is a visual collaboration platform that organizes projects into boards. This plugin provides comprehensive integration with Trello's REST API, enabling you to automate board management, list operations, and card workflows. Use it to streamline project tracking, synchronize data between Trello and other systems, and build event-driven automation based on Trello activities."
 videos: []
 createdBy: "Kestra Core Team"
 managedBy: "Kestra Core Team"
