@@ -1,5 +1,9 @@
 package io.kestra.plugin.trello.cards;
 
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
 import io.kestra.core.http.client.HttpClient;
@@ -10,6 +14,7 @@ import io.kestra.core.models.tasks.VoidOutput;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.JacksonMapper;
 import io.kestra.plugin.trello.AbstractTrelloTask;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
@@ -17,10 +22,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 @SuperBuilder
 @NoArgsConstructor
@@ -91,21 +92,26 @@ public class Update extends AbstractTrelloTask {
             .uri(URI.create(url))
             .addHeader("Content-Type", "application/json")
             .addHeader("Accept", "application/json")
-            .body(HttpRequest.StringRequestBody.builder()
-                .content(JacksonMapper.ofJson().writeValueAsString(updateData))
-                .build());
+            .body(
+                HttpRequest.StringRequestBody.builder()
+                    .content(JacksonMapper.ofJson().writeValueAsString(updateData))
+                    .build()
+            );
 
         HttpRequest request = addAuthHeaders(runContext, requestBuilder).build();
 
-        try (HttpClient httpClient = HttpClient.builder()
-            .runContext(runContext)
-            .build()) {
+        try (
+            HttpClient httpClient = HttpClient.builder()
+                .runContext(runContext)
+                .build()
+        ) {
             HttpResponse<String> response = httpClient.request(request, String.class);
 
             if (response.getStatus().getCode() != 200) {
                 throw new RuntimeException(
                     "Failed to update card: " + response.getStatus().getCode() + " - "
-                        + response.getBody());
+                        + response.getBody()
+                );
             }
 
             return null;

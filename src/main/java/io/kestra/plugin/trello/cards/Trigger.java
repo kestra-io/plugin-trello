@@ -1,6 +1,14 @@
 package io.kestra.plugin.trello.cards;
 
+import java.net.URI;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import com.fasterxml.jackson.databind.JsonNode;
+
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
 import io.kestra.core.http.client.HttpClient;
@@ -13,17 +21,11 @@ import io.kestra.core.models.property.Property;
 import io.kestra.core.models.triggers.*;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.JacksonMapper;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
-import java.net.URI;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @SuperBuilder
 @NoArgsConstructor
@@ -173,23 +175,33 @@ public class Trigger extends AbstractTrigger implements PollingTriggerInterface,
 
         List<CardData> newOrUpdatedCards = new ArrayList<>();
 
-        try (HttpClient httpClient = HttpClient.builder()
-            .runContext(runContext)
-            .build()) {
+        try (
+            HttpClient httpClient = HttpClient.builder()
+                .runContext(runContext)
+                .build()
+        ) {
 
             // If boardId is specified, get all cards from the board
             if (this.boardId != null) {
                 String rBoardId = runContext.render(this.boardId).as(String.class).orElse(null);
                 if (rBoardId != null) {
-                    newOrUpdatedCards.addAll(getCardsFromBoard(runContext, httpClient, rBaseUrl, rVersion,
-                        rApiKey, rApiToken, rBoardId, lastCheckTime));
+                    newOrUpdatedCards.addAll(
+                        getCardsFromBoard(
+                            runContext, httpClient, rBaseUrl, rVersion,
+                            rApiKey, rApiToken, rBoardId, lastCheckTime
+                        )
+                    );
                 }
             }
 
             // Get cards from specified lists
             for (String listId : listsToMonitor) {
-                newOrUpdatedCards.addAll(getCardsFromList(runContext, httpClient, rBaseUrl, rVersion,
-                    rApiKey, rApiToken, listId, lastCheckTime));
+                newOrUpdatedCards.addAll(
+                    getCardsFromList(
+                        runContext, httpClient, rBaseUrl, rVersion,
+                        rApiKey, rApiToken, listId, lastCheckTime
+                    )
+                );
             }
         }
 
@@ -210,21 +222,21 @@ public class Trigger extends AbstractTrigger implements PollingTriggerInterface,
     }
 
     private List<CardData> getCardsFromBoard(RunContext runContext, HttpClient httpClient, String baseUrl,
-                                             String version, String apiKey, String apiToken,
-                                             String boardId, Instant lastCheckTime) throws Exception {
+        String version, String apiKey, String apiToken,
+        String boardId, Instant lastCheckTime) throws Exception {
         String url = buildApiUrl(baseUrl, version, "boards/" + boardId + "/cards");
         return fetchAndFilterCards(runContext, httpClient, url, apiKey, apiToken, lastCheckTime);
     }
 
     private List<CardData> getCardsFromList(RunContext runContext, HttpClient httpClient, String baseUrl,
-                                            String version, String apiKey, String apiToken,
-                                            String listId, Instant lastCheckTime) throws Exception {
+        String version, String apiKey, String apiToken,
+        String listId, Instant lastCheckTime) throws Exception {
         String url = buildApiUrl(baseUrl, version, "lists/" + listId + "/cards");
         return fetchAndFilterCards(runContext, httpClient, url, apiKey, apiToken, lastCheckTime);
     }
 
     private List<CardData> fetchAndFilterCards(RunContext runContext, HttpClient httpClient, String url,
-                                               String apiKey, String apiToken, Instant lastCheckTime) throws Exception {
+        String apiKey, String apiToken, Instant lastCheckTime) throws Exception {
         List<CardData> results = new ArrayList<>();
 
         HttpRequest.HttpRequestBuilder requestBuilder = HttpRequest.builder()
@@ -238,7 +250,8 @@ public class Trigger extends AbstractTrigger implements PollingTriggerInterface,
 
         if (response.getStatus().getCode() != 200) {
             throw new RuntimeException(
-                "Failed to fetch cards: " + response.getStatus().getCode() + " - " + response.getBody());
+                "Failed to fetch cards: " + response.getStatus().getCode() + " - " + response.getBody()
+            );
         }
 
         JsonNode cardsArray = JacksonMapper.ofJson().readTree(response.getBody());
@@ -300,7 +313,7 @@ public class Trigger extends AbstractTrigger implements PollingTriggerInterface,
     }
 
     private HttpRequest.HttpRequestBuilder addAuthHeaders(String apiKey, String apiToken,
-                                                          HttpRequest.HttpRequestBuilder builder) {
+        HttpRequest.HttpRequestBuilder builder) {
         String authHeader = String.format("OAuth oauth_consumer_key=\"%s\", oauth_token=\"%s\"", apiKey, apiToken);
         return builder.addHeader("Authorization", authHeader);
     }

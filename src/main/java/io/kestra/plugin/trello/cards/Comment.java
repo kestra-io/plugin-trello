@@ -1,6 +1,11 @@
 package io.kestra.plugin.trello.cards;
 
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 import com.fasterxml.jackson.databind.JsonNode;
+
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
 import io.kestra.core.http.client.HttpClient;
@@ -10,14 +15,11 @@ import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.JacksonMapper;
 import io.kestra.plugin.trello.AbstractTrelloTask;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
-import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 @SuperBuilder
 @NoArgsConstructor
@@ -74,21 +76,24 @@ public class Comment extends AbstractTrelloTask {
 
         HttpRequest request = addAuthHeaders(runContext, requestBuilder).build();
 
-        try (HttpClient httpClient = HttpClient.builder()
-            .runContext(runContext)
-            .build()) {
+        try (
+            HttpClient httpClient = HttpClient.builder()
+                .runContext(runContext)
+                .build()
+        ) {
             HttpResponse<String> response = httpClient.request(request, String.class);
 
             if (response.getStatus().getCode() != 200) {
                 throw new RuntimeException(
                     "Failed to add comment: " + response.getStatus().getCode() + " - "
-                        + response.getBody());
+                        + response.getBody()
+                );
             }
 
             JsonNode jsonNode = JacksonMapper.ofJson().readTree(response.getBody());
 
             return Output.builder()
-                .commentId(jsonNode.has("id")?jsonNode.get("id").asText():null)
+                .commentId(jsonNode.has("id") ? jsonNode.get("id").asText() : null)
                 .build();
         }
     }

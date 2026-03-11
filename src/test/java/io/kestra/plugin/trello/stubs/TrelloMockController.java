@@ -1,11 +1,11 @@
 package io.kestra.plugin.trello.stubs;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 @Controller("/1")
 public class TrelloMockController {
@@ -15,18 +15,18 @@ public class TrelloMockController {
         String recentDate = Instant.now().minus(2, ChronoUnit.MINUTES).toString();
 
         String mockResponse = """
-                [
-                  {
-                    "id": "card123",
-                    "name": "Test Card",
-                    "desc": "Test Description",
-                    "listId": "%s",
-                    "idBoard": "board123",
-                    "shortUrl": "https://trello.com/c/card123",
-                    "dateLastActivity": "%s"
-                  }
-                ]
-                """.formatted(listId, recentDate);
+            [
+              {
+                "id": "card123",
+                "name": "Test Card",
+                "desc": "Test Description",
+                "listId": "%s",
+                "idBoard": "board123",
+                "shortUrl": "https://trello.com/c/card123",
+                "dateLastActivity": "%s"
+              }
+            ]
+            """.formatted(listId, recentDate);
 
         return HttpResponse.ok(mockResponse).contentType(MediaType.APPLICATION_JSON_TYPE);
     }
@@ -36,18 +36,18 @@ public class TrelloMockController {
         String recentDate = Instant.now().minus(2, ChronoUnit.MINUTES).toString();
 
         String mockResponse = """
-                [
-                  {
-                    "id": "card456",
-                    "name": "Board Test Card",
-                    "desc": "Board Test Description",
-                    "listId": "list789",
-                    "idBoard": "%s",
-                    "shortUrl": "https://trello.com/c/card456",
-                    "dateLastActivity": "%s"
-                  }
-                ]
-                """.formatted(boardId, recentDate);
+            [
+              {
+                "id": "card456",
+                "name": "Board Test Card",
+                "desc": "Board Test Description",
+                "listId": "list789",
+                "idBoard": "%s",
+                "shortUrl": "https://trello.com/c/card456",
+                "dateLastActivity": "%s"
+              }
+            ]
+            """.formatted(boardId, recentDate);
 
         return HttpResponse.ok(mockResponse).contentType(MediaType.APPLICATION_JSON_TYPE);
     }
@@ -55,16 +55,16 @@ public class TrelloMockController {
     @Post(uri = "/cards", consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
     public HttpResponse<String> createCard(@Body String body) {
         String mockResponse = """
-                {
-                  "id": "test-card-id",
-                  "name": "Test Card",
-                  "desc": "This is a test card",
-                  "listId": "list123",
-                  "idBoard": "board123",
-                  "shortUrl": "https://trello.com/c/test123",
-                  "dateLastActivity": "%s"
-                }
-                """.formatted(Instant.now().toString());
+            {
+              "id": "test-card-id",
+              "name": "Test Card",
+              "desc": "This is a test card",
+              "listId": "list123",
+              "idBoard": "board123",
+              "shortUrl": "https://trello.com/c/test123",
+              "dateLastActivity": "%s"
+            }
+            """.formatted(Instant.now().toString());
 
         return HttpResponse.ok(mockResponse).contentType(MediaType.APPLICATION_JSON_TYPE);
     }
@@ -72,16 +72,16 @@ public class TrelloMockController {
     @Put(uri = "/cards/{cardId}", consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
     public HttpResponse<String> updateCard(String cardId, @Body String body) {
         String mockResponse = """
-                {
-                  "id": "%s",
-                  "name": "Updated Card",
-                  "desc": "Updated description",
-                  "listId": "list456",
-                  "idBoard": "board123",
-                  "shortUrl": "https://trello.com/c/%s",
-                  "dateLastActivity": "%s"
-                }
-                """.formatted(cardId, cardId, Instant.now().toString());
+            {
+              "id": "%s",
+              "name": "Updated Card",
+              "desc": "Updated description",
+              "listId": "list456",
+              "idBoard": "board123",
+              "shortUrl": "https://trello.com/c/%s",
+              "dateLastActivity": "%s"
+            }
+            """.formatted(cardId, cardId, Instant.now().toString());
 
         return HttpResponse.ok(mockResponse).contentType(MediaType.APPLICATION_JSON_TYPE);
     }
@@ -89,18 +89,18 @@ public class TrelloMockController {
     @Post(uri = "/cards/{cardId}/actions/comments", produces = MediaType.APPLICATION_JSON)
     public HttpResponse<String> addComment(String cardId, @QueryValue String text) {
         String mockResponse = """
-                {
-                  "id": "comment123",
-                  "type": "commentCard",
-                  "data": {
-                    "text": "%s",
-                    "card": {
-                      "id": "%s"
-                    }
-                  },
-                  "date": "%s"
+            {
+              "id": "comment123",
+              "type": "commentCard",
+              "data": {
+                "text": "%s",
+                "card": {
+                  "id": "%s"
                 }
-                """.formatted(text != null ? text : "Test comment", cardId, Instant.now().toString());
+              },
+              "date": "%s"
+            }
+            """.formatted(text != null ? text : "Test comment", cardId, Instant.now().toString());
 
         return HttpResponse.ok(mockResponse).contentType(MediaType.APPLICATION_JSON_TYPE);
     }

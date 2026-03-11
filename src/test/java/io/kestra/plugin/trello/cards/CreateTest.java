@@ -1,14 +1,16 @@
 package io.kestra.plugin.trello.cards;
 
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+
 import io.kestra.core.context.TestRunContextFactory;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.utils.TestsUtils;
 import io.kestra.plugin.trello.AbstractTrelloTest;
-import jakarta.inject.Inject;
-import org.junit.jupiter.api.Test;
 
-import java.util.Map;
+import jakarta.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
