@@ -29,8 +29,8 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @EqualsAndHashCode
 @Schema(
-    title = "Move a Trello card between lists",
-    description = "Move a card from one list to another"
+    title = "Move cards between Trello lists",
+    description = "Moves one card to another Trello list by updating its `idList`. Optionally sets the destination position with `top`, `bottom`, or a positive float"
 )
 @Plugin(
     examples = {
@@ -54,15 +54,15 @@ import lombok.experimental.SuperBuilder;
 )
 public class Move extends AbstractTrelloTask {
 
-    @Schema(title = "Card ID", description = "The ID of the card to move")
+    @Schema(title = "Card ID", description = "Card ID to move")
     @NotNull
     protected Property<String> cardId;
 
-    @Schema(title = "Target List ID", description = "The ID of the list to move the card to")
+    @Schema(title = "Target List ID", description = "Destination Trello list ID")
     @NotNull
     protected Property<String> listId;
 
-    @Schema(title = "Position", description = "The position of the card in the new list. top, bottom, or a positive float")
+    @Schema(title = "Card Position", description = "Destination position: `top`, `bottom`, or a positive float")
     protected Property<String> pos;
 
     @Override

@@ -27,8 +27,8 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @EqualsAndHashCode
 @Schema(
-    title = "Create a new Trello card",
-    description = "Create a new card in a specified Trello list"
+    title = "Create cards in a Trello list",
+    description = "Creates one card in the target Trello list and returns the new card ID. All properties are rendered before the request; `pos` accepts `top`, `bottom`, or a positive float"
 )
 @Plugin(
     examples = {
@@ -53,21 +53,21 @@ import lombok.experimental.SuperBuilder;
 )
 public class Create extends AbstractTrelloTask {
 
-    @Schema(title = "Card Name", description = "The name for the card")
+    @Schema(title = "Card Name", description = "Name for the new card")
     @NotNull
     protected Property<String> name;
 
-    @Schema(title = "List ID", description = "The ID of the list where the card will be created")
+    @Schema(title = "List ID", description = "Target Trello list ID")
     @NotNull
     protected Property<String> listId;
 
-    @Schema(title = "Description", description = "The description for the card")
+    @Schema(title = "Card Description", description = "Description text for the new card")
     protected Property<String> desc;
 
-    @Schema(title = "Position", description = "The position of the new card. top, bottom, or a positive float")
+    @Schema(title = "Card Position", description = "Position in the list: `top`, `bottom`, or a positive float")
     protected Property<String> pos;
 
-    @Schema(title = "Due Date", description = "A due date for the card")
+    @Schema(title = "Card Due Date", description = "Due date value passed to Trello as provided")
     protected Property<String> due;
 
     @Override
@@ -124,7 +124,7 @@ public class Create extends AbstractTrelloTask {
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(title = "Card ID")
+        @Schema(title = "Created Card ID", description = "Card ID returned by Trello")
         private final String cardId;
     }
 }

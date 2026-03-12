@@ -28,8 +28,8 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode
 
 @Schema(
-    title = "Add a comment to a Trello card",
-    description = "Add a comment/action to an existing Trello card"
+    title = "Add comments to Trello cards",
+    description = "Posts one comment to an existing Trello card and returns the created comment ID. The `text` property is rendered, URL-encoded, and sent as a query parameter, so avoid putting secrets in comments"
 )
 @Plugin(
     examples = {
@@ -53,11 +53,11 @@ import lombok.experimental.SuperBuilder;
 )
 public class Comment extends AbstractTrelloTask {
 
-    @Schema(title = "Card ID", description = "The ID of the card to add a comment to")
+    @Schema(title = "Card ID", description = "Card ID to comment on")
     @NotNull
     protected Property<String> cardId;
 
-    @Schema(title = "Comment Text", description = "The text of the comment")
+    @Schema(title = "Comment Text", description = "Comment text sent to Trello")
     @NotNull
     protected Property<String> text;
 
@@ -101,7 +101,7 @@ public class Comment extends AbstractTrelloTask {
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(title = "Comment ID")
+        @Schema(title = "Created Comment ID", description = "Comment ID returned by Trello")
         private final String commentId;
     }
 }
