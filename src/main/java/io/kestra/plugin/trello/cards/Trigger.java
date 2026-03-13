@@ -33,9 +33,8 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @EqualsAndHashCode
 @Schema(
-    title = "Trigger on Trello card creation or update",
-    description = "Monitor Trello lists or boards for new or updated cards and trigger executions when detected. "
-        + "This trigger polls the Trello API at regular intervals."
+    title = "Poll Trello cards for changes",
+    description = "Polls Trello list and board card endpoints and triggers an execution when `dateLastActivity` is newer than the previous interval window. Defaults to `PT5M`; if you set both `boardId` and `lists`, both sources are polled and the same card can appear more than once"
 )
 
 @Plugin(
@@ -122,29 +121,29 @@ import lombok.experimental.SuperBuilder;
 )
 public class Trigger extends AbstractTrigger implements PollingTriggerInterface, TriggerOutput<Trigger.Output> {
 
-    @Schema(title = "Trello API Key", description = "Your Trello API key")
+    @Schema(title = "Trello API Key", description = "API key used to authenticate Trello requests. Render this from a secret")
     @NotNull
     protected Property<String> apiKey;
 
-    @Schema(title = "Trello API Token", description = "Your Trello API token")
+    @Schema(title = "Trello API Token", description = "API token used to authenticate Trello requests. Render this from a secret")
     @NotNull
     protected Property<String> apiToken;
 
-    @Schema(title = "API Version", description = "Trello API version to use")
+    @Schema(title = "API Version", description = "Trello REST API version appended to the base URL. Defaults to `1`")
     @Builder.Default
     protected Property<String> apiVersion = Property.ofValue("1");
 
-    @Schema(title = "Base API URL", description = "The base URL for the Trello API")
+    @Schema(title = "Base API URL", description = "Base URL for Trello API requests. Defaults to `https://api.trello.com`; override only for compatible proxies or tests")
     @Builder.Default
     protected Property<String> apiBaseUrl = Property.ofValue("https://api.trello.com");
 
-    @Schema(title = "List IDs", description = "Multiple Trello list IDs to monitor for card changes")
+    @Schema(title = "List IDs", description = "Trello list IDs to poll for new or updated cards")
     protected Property<List<String>> lists;
 
-    @Schema(title = "Board ID", description = "Trello board ID to monitor for card changes across all lists")
+    @Schema(title = "Board ID", description = "Trello board ID to poll across all lists on the board")
     protected Property<String> boardId;
 
-    @Schema(title = "Polling interval", description = "How often to check for new or updated cards")
+    @Schema(title = "Polling Interval", description = "Time between Trello checks. Defaults to `PT5M`")
     @PluginProperty
     @Builder.Default
     private Duration interval = Duration.ofMinutes(5);
@@ -321,38 +320,38 @@ public class Trigger extends AbstractTrigger implements PollingTriggerInterface,
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(title = "Total number of new or updated cards found")
+        @Schema(title = "Detected Card Count", description = "Declared count field. This trigger currently returns card details in `cards`")
         private final Integer count;
 
-        @Schema(title = "All new or updated cards found")
+        @Schema(title = "Detected Cards", description = "Cards matched in this polling window")
         private final List<CardData> cards;
     }
 
     @Builder
     @Getter
     public static class CardData {
-        @Schema(title = "Card ID")
+        @Schema(title = "Detected Card ID", description = "Trello card ID")
         private final String cardId;
 
-        @Schema(title = "Card Name")
+        @Schema(title = "Detected Card Name", description = "Trello card name")
         private final String cardName;
 
-        @Schema(title = "Card URL")
+        @Schema(title = "Detected Card URL", description = "Short Trello URL for the card")
         private final String cardUrl;
 
-        @Schema(title = "Card Description")
+        @Schema(title = "Detected Card Description", description = "Card description returned by Trello")
         private final String cardDescription;
 
-        @Schema(title = "Last Activity Time")
+        @Schema(title = "Last Activity Time", description = "Latest Trello activity timestamp used for filtering")
         private final Instant lastActivity;
 
-        @Schema(title = "Action Type")
+        @Schema(title = "Detected Action Type", description = "Derived action label: `created` or `updated`")
         private final String action;
 
-        @Schema(title = "List ID")
+        @Schema(title = "Detected List ID", description = "List ID returned by Trello")
         private final String listId;
 
-        @Schema(title = "Board ID")
+        @Schema(title = "Detected Board ID", description = "Board ID returned by Trello")
         private final String boardId;
     }
 }

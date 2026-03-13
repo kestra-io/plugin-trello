@@ -29,8 +29,8 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @EqualsAndHashCode
 @Schema(
-    title = "Update a Trello card",
-    description = "Update an existing Trello card's properties"
+    title = "Update fields on a Trello card",
+    description = "Updates only the card fields you set on an existing Trello card. Use `closed` to archive or reopen the card; all properties are rendered before the request"
 )
 @Plugin(
     examples = {
@@ -55,23 +55,23 @@ import lombok.experimental.SuperBuilder;
 )
 public class Update extends AbstractTrelloTask {
 
-    @Schema(title = "Card ID", description = "The ID of the card to update")
+    @Schema(title = "Card ID", description = "Card ID to update")
     @NotNull
     protected Property<String> cardId;
 
-    @Schema(title = "Card Name", description = "The new name for the card")
+    @Schema(title = "Card Name", description = "New card name")
     protected Property<String> name;
 
-    @Schema(title = "Description", description = "The new description for the card")
+    @Schema(title = "Card Description", description = "New card description")
     protected Property<String> desc;
 
-    @Schema(title = "Closed", description = "Whether the card should be archived/closed")
+    @Schema(title = "Closed State", description = "Set to `true` to archive the card or `false` to reopen it")
     protected Property<Boolean> closed;
 
-    @Schema(title = "Due Date", description = "A due date for the card")
+    @Schema(title = "Card Due Date", description = "Due date value passed to Trello as provided")
     protected Property<String> due;
 
-    @Schema(title = "Position", description = "The position of the card. top, bottom, or a positive float")
+    @Schema(title = "Card Position", description = "Position in the list: `top`, `bottom`, or a positive float")
     protected Property<String> pos;
 
     @Override

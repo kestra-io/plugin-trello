@@ -20,19 +20,19 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public abstract class AbstractTrelloTask extends Task implements RunnableTask<io.kestra.core.models.tasks.Output> {
 
-    @Schema(title = "Trello API Key", description = "Your Trello API key")
+    @Schema(title = "Trello API Key", description = "API key used to authenticate Trello requests. Render this from a secret")
     @NotNull
     protected Property<String> apiKey;
 
-    @Schema(title = "Trello API Token", description = "Your Trello API token")
+    @Schema(title = "Trello API Token", description = "API token used to authenticate Trello requests. Render this from a secret")
     @NotNull
     protected Property<String> apiToken;
 
-    @Schema(title = "API Version", description = "Trello API version to use", defaultValue = "1")
+    @Schema(title = "API Version", description = "Trello REST API version appended to the base URL. Defaults to `1`", defaultValue = "1")
     @Builder.Default
     protected Property<String> apiVersion = Property.ofValue("1");
 
-    @Schema(title = "Base API URL", description = "The base URL for the Trello API")
+    @Schema(title = "Base API URL", description = "Base URL for Trello API requests. Defaults to `https://api.trello.com`; override only for compatible proxies or tests")
     @Builder.Default
     protected Property<String> apiBaseUrl = Property.ofValue("https://api.trello.com");
 
