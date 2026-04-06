@@ -13,6 +13,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @EqualsAndHashCode
@@ -22,18 +23,22 @@ public abstract class AbstractTrelloTask extends Task implements RunnableTask<io
 
     @Schema(title = "Trello API Key", description = "API key used to authenticate Trello requests. Render this from a secret")
     @NotNull
+    @PluginProperty(group = "main")
     protected Property<String> apiKey;
 
     @Schema(title = "Trello API Token", description = "API token used to authenticate Trello requests. Render this from a secret")
     @NotNull
+    @PluginProperty(group = "main")
     protected Property<String> apiToken;
 
     @Schema(title = "API Version", description = "Trello REST API version appended to the base URL. Defaults to `1`", defaultValue = "1")
     @Builder.Default
+    @PluginProperty(group = "advanced")
     protected Property<String> apiVersion = Property.ofValue("1");
 
     @Schema(title = "Base API URL", description = "Base URL for Trello API requests. Defaults to `https://api.trello.com`; override only for compatible proxies or tests")
     @Builder.Default
+    @PluginProperty(group = "connection")
     protected Property<String> apiBaseUrl = Property.ofValue("https://api.trello.com");
 
     protected String buildApiUrl(RunContext runContext, String endpoint) throws Exception {
