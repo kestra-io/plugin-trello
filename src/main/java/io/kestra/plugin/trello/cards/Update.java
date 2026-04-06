@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @NoArgsConstructor
@@ -57,21 +58,27 @@ public class Update extends AbstractTrelloTask {
 
     @Schema(title = "Card ID", description = "Card ID to update")
     @NotNull
+    @PluginProperty(group = "main")
     protected Property<String> cardId;
 
     @Schema(title = "Card Name", description = "New card name")
+    @PluginProperty(group = "destination")
     protected Property<String> name;
 
     @Schema(title = "Card Description", description = "New card description")
+    @PluginProperty(group = "advanced")
     protected Property<String> desc;
 
     @Schema(title = "Closed State", description = "Set to `true` to archive the card or `false` to reopen it")
+    @PluginProperty(group = "advanced")
     protected Property<Boolean> closed;
 
     @Schema(title = "Card Due Date", description = "Due date value passed to Trello as provided")
+    @PluginProperty(group = "advanced")
     protected Property<String> due;
 
     @Schema(title = "Card Position", description = "Position in the list: `top`, `bottom`, or a positive float")
+    @PluginProperty(group = "advanced")
     protected Property<String> pos;
 
     @Override

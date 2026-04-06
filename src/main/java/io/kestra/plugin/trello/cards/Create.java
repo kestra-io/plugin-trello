@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @NoArgsConstructor
@@ -55,19 +56,24 @@ public class Create extends AbstractTrelloTask {
 
     @Schema(title = "Card Name", description = "Name for the new card")
     @NotNull
+    @PluginProperty(group = "main")
     protected Property<String> name;
 
     @Schema(title = "List ID", description = "Target Trello list ID")
     @NotNull
+    @PluginProperty(group = "main")
     protected Property<String> listId;
 
     @Schema(title = "Card Description", description = "Description text for the new card")
+    @PluginProperty(group = "advanced")
     protected Property<String> desc;
 
     @Schema(title = "Card Position", description = "Position in the list: `top`, `bottom`, or a positive float")
+    @PluginProperty(group = "advanced")
     protected Property<String> pos;
 
     @Schema(title = "Card Due Date", description = "Due date value passed to Trello as provided")
+    @PluginProperty(group = "advanced")
     protected Property<String> due;
 
     @Override

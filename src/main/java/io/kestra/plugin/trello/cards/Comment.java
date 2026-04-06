@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @NoArgsConstructor
@@ -55,10 +56,12 @@ public class Comment extends AbstractTrelloTask {
 
     @Schema(title = "Card ID", description = "Card ID to comment on")
     @NotNull
+    @PluginProperty(group = "main")
     protected Property<String> cardId;
 
     @Schema(title = "Comment Text", description = "Comment text sent to Trello")
     @NotNull
+    @PluginProperty(group = "main")
     protected Property<String> text;
 
     @Override

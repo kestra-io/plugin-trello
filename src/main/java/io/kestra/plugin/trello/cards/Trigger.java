@@ -123,28 +123,34 @@ public class Trigger extends AbstractTrigger implements PollingTriggerInterface,
 
     @Schema(title = "Trello API Key", description = "API key used to authenticate Trello requests. Render this from a secret")
     @NotNull
+    @PluginProperty(group = "main")
     protected Property<String> apiKey;
 
     @Schema(title = "Trello API Token", description = "API token used to authenticate Trello requests. Render this from a secret")
     @NotNull
+    @PluginProperty(group = "main")
     protected Property<String> apiToken;
 
     @Schema(title = "API Version", description = "Trello REST API version appended to the base URL. Defaults to `1`")
     @Builder.Default
+    @PluginProperty(group = "advanced")
     protected Property<String> apiVersion = Property.ofValue("1");
 
     @Schema(title = "Base API URL", description = "Base URL for Trello API requests. Defaults to `https://api.trello.com`; override only for compatible proxies or tests")
     @Builder.Default
+    @PluginProperty(group = "connection")
     protected Property<String> apiBaseUrl = Property.ofValue("https://api.trello.com");
 
     @Schema(title = "List IDs", description = "Trello list IDs to poll for new or updated cards")
+    @PluginProperty(group = "advanced")
     protected Property<List<String>> lists;
 
     @Schema(title = "Board ID", description = "Trello board ID to poll across all lists on the board")
+    @PluginProperty(group = "advanced")
     protected Property<String> boardId;
 
     @Schema(title = "Polling Interval", description = "Time between Trello checks. Defaults to `PT5M`")
-    @PluginProperty
+    @PluginProperty(group = "execution")
     @Builder.Default
     private Duration interval = Duration.ofMinutes(5);
 
@@ -331,27 +337,35 @@ public class Trigger extends AbstractTrigger implements PollingTriggerInterface,
     @Getter
     public static class CardData {
         @Schema(title = "Detected Card ID", description = "Trello card ID")
+        @PluginProperty(group = "advanced")
         private final String cardId;
 
         @Schema(title = "Detected Card Name", description = "Trello card name")
+        @PluginProperty(group = "advanced")
         private final String cardName;
 
         @Schema(title = "Detected Card URL", description = "Short Trello URL for the card")
+        @PluginProperty(group = "connection")
         private final String cardUrl;
 
         @Schema(title = "Detected Card Description", description = "Card description returned by Trello")
+        @PluginProperty(group = "advanced")
         private final String cardDescription;
 
         @Schema(title = "Last Activity Time", description = "Latest Trello activity timestamp used for filtering")
+        @PluginProperty(group = "advanced")
         private final Instant lastActivity;
 
         @Schema(title = "Detected Action Type", description = "Derived action label: `created` or `updated`")
+        @PluginProperty(group = "advanced")
         private final String action;
 
         @Schema(title = "Detected List ID", description = "List ID returned by Trello")
+        @PluginProperty(group = "advanced")
         private final String listId;
 
         @Schema(title = "Detected Board ID", description = "Board ID returned by Trello")
+        @PluginProperty(group = "advanced")
         private final String boardId;
     }
 }

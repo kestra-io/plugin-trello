@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @NoArgsConstructor
@@ -56,13 +57,16 @@ public class Move extends AbstractTrelloTask {
 
     @Schema(title = "Card ID", description = "Card ID to move")
     @NotNull
+    @PluginProperty(group = "main")
     protected Property<String> cardId;
 
     @Schema(title = "Target List ID", description = "Destination Trello list ID")
     @NotNull
+    @PluginProperty(group = "main")
     protected Property<String> listId;
 
     @Schema(title = "Card Position", description = "Destination position: `top`, `bottom`, or a positive float")
+    @PluginProperty(group = "advanced")
     protected Property<String> pos;
 
     @Override
