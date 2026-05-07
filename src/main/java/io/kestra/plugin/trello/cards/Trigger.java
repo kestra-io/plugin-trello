@@ -48,7 +48,7 @@ import lombok.experimental.SuperBuilder;
 
                 tasks:
                   - id: notify_slack
-                    type: io.kestra.plugin.notifications.slack.SlackIncomingWebhook
+                    type: io.kestra.plugin.slack.notifications.SlackIncomingWebhook
                     url: "{{ secret('SLACK_WEBHOOK_URL') }}"
                     payload: |
                       {
@@ -74,7 +74,7 @@ import lombok.experimental.SuperBuilder;
 
                 tasks:
                   - id: notify_slack
-                    type: io.kestra.plugin.notifications.slack.SlackIncomingWebhook
+                    type: io.kestra.plugin.slack.notifications.SlackIncomingWebhook
                     url: "{{ secret('SLACK_WEBHOOK_URL') }}"
                     payload: |
                       {
@@ -101,7 +101,7 @@ import lombok.experimental.SuperBuilder;
 
                 tasks:
                   - id: notify_slack
-                    type: io.kestra.plugin.notifications.slack.SlackIncomingWebhook
+                    type: io.kestra.plugin.slack.notifications.SlackIncomingWebhook
                     url: "{{ secret('SLACK_WEBHOOK_URL') }}"
                     payload: |
                       {
