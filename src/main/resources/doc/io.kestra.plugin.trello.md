@@ -4,7 +4,7 @@ Manage cards on Trello boards from Kestra flows.
 
 ## Authentication
 
-Set `apiKey` to your Trello API key and `apiToken` to your Trello API token. Store secrets in [secrets](https://kestra.io/docs/concepts/secret) and apply connection properties globally with [plugin defaults](https://kestra.io/docs/workflow-components/plugin-defaults).
+Set `apiKey` to your Trello API key and `apiToken` to your Trello API token. Store secrets in [secrets](https://kestra.io/docs/concepts/secret) and set connection properties on each task.
 
 ## Tasks
 
