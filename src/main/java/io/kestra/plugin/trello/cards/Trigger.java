@@ -218,6 +218,7 @@ public class Trigger extends AbstractTrigger implements PollingTriggerInterface,
         runContext.logger().info("Found {} new or updated cards", newOrUpdatedCards.size());
 
         Output output = Output.builder()
+            .count(newOrUpdatedCards.size())
             .cards(newOrUpdatedCards)
             .build();
 
@@ -326,7 +327,7 @@ public class Trigger extends AbstractTrigger implements PollingTriggerInterface,
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(title = "Detected Card Count", description = "Declared count field. This trigger currently returns card details in `cards`")
+        @Schema(title = "Detected Card Count", description = "Number of new or updated cards detected in this polling window (size of `cards`)")
         private final Integer count;
 
         @Schema(title = "Detected Cards", description = "Cards matched in this polling window")
