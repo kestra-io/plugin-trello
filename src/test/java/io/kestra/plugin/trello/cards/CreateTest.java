@@ -12,6 +12,8 @@ import io.kestra.plugin.trello.AbstractTrelloTest;
 
 import jakarta.inject.Inject;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class CreateTest extends AbstractTrelloTest {
@@ -33,7 +35,10 @@ public class CreateTest extends AbstractTrelloTest {
             .build();
 
         RunContext runContext = TestsUtils.mockRunContext(runContextFactory, task, Map.of());
-        assertDoesNotThrow(() -> task.run(runContext));
+        Create.Output output = task.run(runContext);
+
+        assertThat(output.getCardId(), is("test-card-id"));
+        assertThat(output.getCardUrl(), is("https://trello.com/c/test123"));
     }
 
     @Test

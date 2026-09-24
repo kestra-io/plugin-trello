@@ -1,8 +1,8 @@
 package io.kestra.plugin.trello;
 
 import io.kestra.core.http.HttpRequest;
+import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.property.Property;
-import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.models.tasks.Task;
 import io.kestra.core.runners.RunContext;
 
@@ -13,27 +13,26 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @EqualsAndHashCode
 @Getter
 @NoArgsConstructor
-public abstract class AbstractTrelloTask extends Task implements RunnableTask<io.kestra.core.models.tasks.Output> {
+public abstract class AbstractTrelloTask extends Task {
 
     @Schema(title = "Trello API Key", description = "API key used to authenticate Trello requests. Render this from a secret")
     @NotNull
-    @PluginProperty(secret = true, group = "main")
+    @PluginProperty(secret = true, group = "connection")
     protected Property<String> apiKey;
 
     @Schema(title = "Trello API Token", description = "API token used to authenticate Trello requests. Render this from a secret")
     @NotNull
-    @PluginProperty(secret = true, group = "main")
+    @PluginProperty(secret = true, group = "connection")
     protected Property<String> apiToken;
 
     @Schema(title = "API Version", description = "Trello REST API version appended to the base URL. Defaults to `1`", defaultValue = "1")
     @Builder.Default
-    @PluginProperty(group = "advanced")
+    @PluginProperty(group = "connection")
     protected Property<String> apiVersion = Property.ofValue("1");
 
     @Schema(title = "Base API URL", description = "Base URL for Trello API requests. Defaults to `https://api.trello.com`; override only for compatible proxies or tests")

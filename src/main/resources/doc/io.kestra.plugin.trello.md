@@ -8,7 +8,7 @@ Set `apiKey` to your Trello API key and `apiToken` to your Trello API token. Sto
 
 ## Tasks
 
-`cards.Create` creates a card — set `name` and `listId` (both required). Optionally set `desc`, `pos`, and `due`. The output includes the new `cardId`.
+`cards.Create` creates a card — set `name` and `listId` (both required). Optionally set `desc`, `pos`, and `due`. The output includes the new `cardId` and its browsable `cardUrl`.
 
 `cards.Update` updates a card by `cardId` — set any of `name`, `desc`, `closed` (archive/reopen), `due`, or `pos`.
 

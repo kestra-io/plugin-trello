@@ -12,6 +12,8 @@ import io.kestra.plugin.trello.AbstractTrelloTest;
 
 import jakarta.inject.Inject;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class CommentTest extends AbstractTrelloTest {
@@ -45,7 +47,9 @@ public class CommentTest extends AbstractTrelloTest {
             .build();
 
         RunContext commentContext = runContextFactory.of();
-        assertDoesNotThrow(() -> commentTask.run(commentContext));
+        Comment.Output output = commentTask.run(commentContext);
+
+        assertThat(output.getCommentId(), is("comment123"));
     }
 
     @Test

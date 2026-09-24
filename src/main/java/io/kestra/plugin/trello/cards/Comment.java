@@ -11,7 +11,9 @@ import io.kestra.core.http.HttpResponse;
 import io.kestra.core.http.client.HttpClient;
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
+import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.property.Property;
+import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.JacksonMapper;
 import io.kestra.plugin.trello.AbstractTrelloTask;
@@ -20,7 +22,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @NoArgsConstructor
@@ -52,7 +53,7 @@ import io.kestra.core.models.annotations.PluginProperty;
         )
     }
 )
-public class Comment extends AbstractTrelloTask {
+public class Comment extends AbstractTrelloTask implements RunnableTask<Comment.Output> {
 
     @Schema(title = "Card ID", description = "Card ID to comment on")
     @NotNull
@@ -65,7 +66,7 @@ public class Comment extends AbstractTrelloTask {
     protected Property<String> text;
 
     @Override
-    public io.kestra.core.models.tasks.Output run(RunContext runContext) throws Exception {
+    public Output run(RunContext runContext) throws Exception {
         String rId = runContext.render(this.cardId).as(String.class).orElseThrow();
         String rText = runContext.render(this.text).as(String.class).orElseThrow();
 
@@ -96,7 +97,7 @@ public class Comment extends AbstractTrelloTask {
             JsonNode jsonNode = JacksonMapper.ofJson().readTree(response.getBody());
 
             return Output.builder()
-                .commentId(jsonNode.has("id") ? jsonNode.get("id").asText() : null)
+                .commentId(jsonNode.path("id").asText(null))
                 .build();
         }
     }

@@ -9,7 +9,9 @@ import io.kestra.core.http.HttpResponse;
 import io.kestra.core.http.client.HttpClient;
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
+import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.property.Property;
+import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.models.tasks.VoidOutput;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.JacksonMapper;
@@ -22,7 +24,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @NoArgsConstructor
@@ -53,7 +54,7 @@ import io.kestra.core.models.annotations.PluginProperty;
         )
     }
 )
-public class Move extends AbstractTrelloTask {
+public class Move extends AbstractTrelloTask implements RunnableTask<VoidOutput> {
 
     @Schema(title = "Card ID", description = "Card ID to move")
     @NotNull
