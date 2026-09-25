@@ -123,17 +123,17 @@ public class Trigger extends AbstractTrigger implements PollingTriggerInterface,
 
     @Schema(title = "Trello API Key", description = "API key used to authenticate Trello requests. Render this from a secret")
     @NotNull
-    @PluginProperty(secret = true, group = "main")
+    @PluginProperty(secret = true, group = "connection")
     protected Property<String> apiKey;
 
     @Schema(title = "Trello API Token", description = "API token used to authenticate Trello requests. Render this from a secret")
     @NotNull
-    @PluginProperty(secret = true, group = "main")
+    @PluginProperty(secret = true, group = "connection")
     protected Property<String> apiToken;
 
     @Schema(title = "API Version", description = "Trello REST API version appended to the base URL. Defaults to `1`")
     @Builder.Default
-    @PluginProperty(group = "advanced")
+    @PluginProperty(group = "connection")
     protected Property<String> apiVersion = Property.ofValue("1");
 
     @Schema(title = "Base API URL", description = "Base URL for Trello API requests. Defaults to `https://api.trello.com`; override only for compatible proxies or tests")
@@ -218,6 +218,7 @@ public class Trigger extends AbstractTrigger implements PollingTriggerInterface,
         runContext.logger().info("Found {} new or updated cards", newOrUpdatedCards.size());
 
         Output output = Output.builder()
+            .count(newOrUpdatedCards.size())
             .cards(newOrUpdatedCards)
             .build();
 
@@ -326,7 +327,7 @@ public class Trigger extends AbstractTrigger implements PollingTriggerInterface,
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(title = "Detected Card Count", description = "Declared count field. This trigger currently returns card details in `cards`")
+        @Schema(title = "Detected Card Count", description = "Number of new or updated cards detected in this polling window (size of `cards`)")
         private final Integer count;
 
         @Schema(title = "Detected Cards", description = "Cards matched in this polling window")

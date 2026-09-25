@@ -11,7 +11,9 @@ import io.kestra.core.http.HttpResponse;
 import io.kestra.core.http.client.HttpClient;
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
+import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.property.Property;
+import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.JacksonMapper;
 import io.kestra.plugin.trello.AbstractTrelloTask;
@@ -20,7 +22,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @NoArgsConstructor
@@ -29,7 +30,7 @@ import io.kestra.core.models.annotations.PluginProperty;
 @EqualsAndHashCode
 @Schema(
     title = "Create cards in a Trello list",
-    description = "Creates one card in the target Trello list and returns the new card ID. All properties are rendered before the request; `pos` accepts `top`, `bottom`, or a positive float"
+    description = "Creates one card in the target Trello list and returns the new card's ID and URL. All properties are rendered before the request; `pos` accepts `top`, `bottom`, or a positive float"
 )
 @Plugin(
     examples = {
@@ -49,10 +50,33 @@ import io.kestra.core.models.annotations.PluginProperty;
                     listId: "5abbe4b7ddc1b351ef961414"
                     desc: "This is the card description"
                 """
+        ),
+        @Example(
+            title = "Create a card and comment on it",
+            full = true,
+            code = """
+                id: trello_create_and_comment
+                namespace: company.team
+
+                tasks:
+                  - id: create_card
+                    type: io.kestra.plugin.trello.cards.Create
+                    apiKey: "{{ secret('TRELLO_API_KEY') }}"
+                    apiToken: "{{ secret('TRELLO_API_TOKEN') }}"
+                    name: "My New Card"
+                    listId: "5abbe4b7ddc1b351ef961414"
+
+                  - id: comment_on_card
+                    type: io.kestra.plugin.trello.cards.Comment
+                    apiKey: "{{ secret('TRELLO_API_KEY') }}"
+                    apiToken: "{{ secret('TRELLO_API_TOKEN') }}"
+                    cardId: "{{ outputs.create_card.cardId }}"
+                    text: "Card created at {{ outputs.create_card.cardUrl }}"
+                """
         )
     }
 )
-public class Create extends AbstractTrelloTask {
+public class Create extends AbstractTrelloTask implements RunnableTask<Create.Output> {
 
     @Schema(title = "Card Name", description = "Name for the new card")
     @NotNull
@@ -61,11 +85,11 @@ public class Create extends AbstractTrelloTask {
 
     @Schema(title = "List ID", description = "Target Trello list ID")
     @NotNull
-    @PluginProperty(group = "main")
+    @PluginProperty(group = "destination")
     protected Property<String> listId;
 
     @Schema(title = "Card Description", description = "Description text for the new card")
-    @PluginProperty(group = "advanced")
+    @PluginProperty(group = "main")
     protected Property<String> desc;
 
     @Schema(title = "Card Position", description = "Position in the list: `top`, `bottom`, or a positive float")
@@ -77,7 +101,7 @@ public class Create extends AbstractTrelloTask {
     protected Property<String> due;
 
     @Override
-    public io.kestra.core.models.tasks.Output run(RunContext runContext) throws Exception {
+    public Output run(RunContext runContext) throws Exception {
         String url = buildApiUrl(runContext, "cards");
 
         Map<String, Object> cardData = new HashMap<>();
@@ -122,7 +146,8 @@ public class Create extends AbstractTrelloTask {
             JsonNode jsonNode = JacksonMapper.ofJson().readTree(response.getBody());
 
             return Output.builder()
-                .cardId(jsonNode.has("id") ? jsonNode.get("id").asText() : null)
+                .cardId(jsonNode.path("id").asText(null))
+                .cardUrl(jsonNode.path("shortUrl").asText(null))
                 .build();
         }
     }
@@ -130,7 +155,10 @@ public class Create extends AbstractTrelloTask {
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(title = "Created Card ID", description = "Card ID returned by Trello")
+        @Schema(title = "Created Card ID", description = "Card ID returned by Trello. Pass this to `cards.Comment`, `cards.Move`, or `cards.Update` to reference this card")
         private final String cardId;
+
+        @Schema(title = "Created Card URL", description = "Browsable Trello URL for the new card")
+        private final String cardUrl;
     }
 }
