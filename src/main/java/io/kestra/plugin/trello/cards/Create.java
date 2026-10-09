@@ -14,6 +14,7 @@ import io.kestra.core.models.annotations.Plugin;
 import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.RunnableTask;
+import io.kestra.core.models.tasks.TicketingTaskInterface;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.JacksonMapper;
 import io.kestra.plugin.trello.AbstractTrelloTask;
@@ -76,7 +77,7 @@ import lombok.experimental.SuperBuilder;
         )
     }
 )
-public class Create extends AbstractTrelloTask implements RunnableTask<Create.Output> {
+public class Create extends AbstractTrelloTask implements RunnableTask<Create.Output>, TicketingTaskInterface {
 
     @Schema(title = "Card Name", description = "Name for the new card")
     @NotNull
