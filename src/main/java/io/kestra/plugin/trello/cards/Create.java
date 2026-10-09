@@ -12,6 +12,7 @@ import io.kestra.core.http.client.HttpClient;
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
 import io.kestra.core.models.annotations.PluginProperty;
+import io.kestra.core.models.annotations.TicketingField;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.models.tasks.TicketingTaskInterface;
@@ -82,6 +83,7 @@ public class Create extends AbstractTrelloTask implements RunnableTask<Create.Ou
     @Schema(title = "Card Name", description = "Name for the new card")
     @NotNull
     @PluginProperty(group = "main")
+    @TicketingField(role = TicketingField.Role.CASE_TITLE)
     protected Property<String> name;
 
     @Schema(title = "List ID", description = "Target Trello list ID")
@@ -91,6 +93,7 @@ public class Create extends AbstractTrelloTask implements RunnableTask<Create.Ou
 
     @Schema(title = "Card Description", description = "Description text for the new card")
     @PluginProperty(group = "main")
+    @TicketingField(role = TicketingField.Role.CASE_DESCRIPTION)
     protected Property<String> desc;
 
     @Schema(title = "Card Position", description = "Position in the list: `top`, `bottom`, or a positive float")
@@ -157,9 +160,11 @@ public class Create extends AbstractTrelloTask implements RunnableTask<Create.Ou
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
         @Schema(title = "Created Card ID", description = "Card ID returned by Trello. Pass this to `cards.Comment`, `cards.Move`, or `cards.Update` to reference this card")
+        @TicketingField(role = TicketingField.Role.TICKET_KEY)
         private final String cardId;
 
         @Schema(title = "Created Card URL", description = "Browsable Trello URL for the new card")
+        @TicketingField(role = TicketingField.Role.TICKET_URL)
         private final String cardUrl;
     }
 }
